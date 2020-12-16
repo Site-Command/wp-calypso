@@ -7,6 +7,11 @@ import { Plans } from '@automattic/data-stores';
 import type { ValuesType } from 'utility-types';
 
 /**
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+
+/**
  * Internal dependencies
  */
 import config from 'calypso/config';
@@ -110,6 +115,22 @@ export function useNewQueryParam() {
 export function useIsAnchorFm(): boolean {
 	const podcastId = useAnchorFmPodcastId();
 	return Boolean( podcastId && podcastId.match( /^[0-9a-f]{7,8}$/i ) );
+}
+
+// Fetch podcast name
+export async function useAnchorFmPodcastTitle( podcastId ) {
+	if ( ! podcastId ) {
+		return null;
+	}
+
+	let resp;
+
+	try {
+		resp = await apiFetch( { path: `https://public-api.wordpress.com/wpcom/v2/podcast-player?url=https://anchor.fm/s/${podcastId}/podcast/rss` } );
+		return resp.title;
+	} catch ( err ) {
+		return null;
+	}
 }
 
 // Returns the anchor podcast id. First looks in "location state",

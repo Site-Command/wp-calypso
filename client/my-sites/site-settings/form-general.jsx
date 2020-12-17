@@ -12,7 +12,6 @@ import { flowRight, get, has } from 'lodash';
  */
 import wrapSettingsForm from './wrap-settings-form';
 import { Card, CompactCard, Button } from '@automattic/components';
-import EmailVerificationGate from 'calypso/components/email-verification/email-verification-gate';
 import Notice from 'calypso/components/notice';
 import NoticeAction from 'calypso/components/notice/notice-action';
 import LanguagePicker from 'calypso/components/language-picker';
@@ -700,15 +699,6 @@ export class SiteSettingsFormGeneral extends Component {
 
 	privacySettingsWrapper() {
 		if ( this.props.isUnlaunchedSite ) {
-			if ( this.props.needsVerification ) {
-				return (
-					<EmailVerificationGate>
-						{ this.renderLaunchSite() }
-						{ this.privacySettings() }
-					</EmailVerificationGate>
-				);
-			}
-
 			return (
 				<>
 					{ this.renderLaunchSite() }

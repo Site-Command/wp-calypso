@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import page from 'page';
 import React, { Fragment, FunctionComponent } from 'react';
 import { useTranslate, getLocaleSlug } from 'i18n-calypso';
@@ -12,6 +12,9 @@ import config from 'calypso/config';
  */
 import { Button } from '@automattic/components';
 import { getSelectedSiteSlug } from 'calypso/state/ui/selectors';
+import { getCurrentUserId } from 'calypso/state/current-user/selectors';
+import { getUserPurchases } from 'calypso/state/purchases/selectors';
+import { hasTrafficGuidePurchase } from 'calypso/my-sites/marketing/ultimate-traffic-guide';
 import MarketingToolsFeature from './feature';
 import MarketingToolsHeader from './header';
 import {
@@ -21,6 +24,7 @@ import {
 } from 'calypso/my-sites/marketing/paths';
 import PageViewTracker from 'calypso/lib/analytics/page-view-tracker';
 import { recordTracksEvent as recordTracksEventAction } from 'calypso/state/analytics/actions';
+import QueryUserPurchases from 'calypso/components/data/query-user-purchases';
 
 /**
  * Images
@@ -40,16 +44,15 @@ import * as T from 'calypso/types';
  */
 import './style.scss';
 
-interface Props {
-	recordTracksEvent: typeof recordTracksEventAction;
-	selectedSiteSlug: T.SiteSlug | null;
-}
-
-export const MarketingTools: FunctionComponent< Props > = ( {
-	recordTracksEvent,
-	selectedSiteSlug,
-} ) => {
+export const MarketingTools: FunctionComponent = () => {
 	const translate = useTranslate();
+	const dispatch = useDispatch();
+	const recordTracksEvent = ( event: string ) => dispatch( recordTracksEventAction( event ) );
+	const userId = useSelector( ( state ) => getCurrentUserId( state ) ) || 0;
+	const selectedSiteSlug: T.SiteSlug | null = useSelector( ( state ) =>
+		getSelectedSiteSlug( state )
+	);
+	const purchases = useSelector( ( state ) => getUserPurchases( state, userId ) );
 
 	const handleBoostMyTrafficClick = () => {
 		recordTracksEvent( 'calypso_marketing_tools_boost_my_traffic_button_click' );
@@ -91,6 +94,7 @@ export const MarketingTools: FunctionComponent< Props > = ( {
 
 	return (
 		<Fragment>
+			{ ! purchases && <QueryUserPurchases userId={ userId } /> }
 			<PageViewTracker path="/marketing/tools/:site" title="Marketing > Tools" />
 
 			<MarketingToolsHeader handleButtonClick={ handleBoostMyTrafficClick } />
@@ -181,7 +185,9 @@ export const MarketingTools: FunctionComponent< Props > = ( {
 						imagePath={ rocket }
 					>
 						<Button onClick={ handleUltimateTrafficGuideClick }>
-							{ translate( 'Download now' ) }
+							{ hasTrafficGuidePurchase( purchases )
+								? translate( 'Download now' )
+								: translate( 'Learn more' ) }
 						</Button>
 					</MarketingToolsFeature>
 				) }
@@ -190,11 +196,4 @@ export const MarketingTools: FunctionComponent< Props > = ( {
 	);
 };
 
-export default connect(
-	( state ) => ( {
-		selectedSiteSlug: getSelectedSiteSlug( state ),
-	} ),
-	{
-		recordTracksEvent: recordTracksEventAction,
-	}
-)( MarketingTools );
+export default MarketingTools;

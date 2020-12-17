@@ -28,6 +28,7 @@ import { recordTracksEvent as recordTracksEventAction } from 'calypso/state/anal
 import earnIllustration from 'calypso/assets/images/customer-home/illustration--task-earn.svg';
 import fiverrLogo from 'calypso/assets/images/customer-home/fiverr-logo.svg';
 import facebookMessenger from 'calypso/assets/images/illustrations/facebook-messenger.svg';
+import rocket from 'calypso/assets/images/customer-home/illustration--rocket.svg';
 
 /**
  * Types
@@ -173,9 +174,11 @@ export const MarketingTools: FunctionComponent< Props > = ( {
 				{ isEnglish && (
 					<MarketingToolsFeature
 						title={ translate( 'Introducing the WordPress.com Ultimate Traffic Guide' ) }
-						description={ translate( 'Discover today’s most important traffic secrets' ) }
-						imagePath="/calypso/images/marketing/upwork-logo.png"
-						// TODO: Fix image
+						description={ translate(
+							"Our brand new Ultimate Traffic Guide reveals more than a dozen of today's most effective traffic techniques. " +
+								'The guide is appropriate for beginner to intermediate users.'
+						) }
+						imagePath={ rocket }
 					>
 						<Button onClick={ handleUltimateTrafficGuideClick }>
 							{ translate( 'Download now' ) }
